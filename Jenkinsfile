@@ -20,8 +20,25 @@ pipeline {
 
         stage('Desplegar contenedor') {
             steps {
-                sh 'docker rm -f vehiculosrest || true'
-                sh 'docker run -d --name vehiculosrest -p 9090:8080 vehiculosrest'
+                withCredentials([
+                    string(credentialsId: 'db-url', variable: 'DB_URL'),
+                    usernamePassword(
+                        credentialsId: 'db-credentials',
+                        usernameVariable: 'DB_USER',
+                        passwordVariable: 'DB_PASSWORD'
+                    )
+                ]) {
+                    sh 'docker rm -f vehiculosrest || true'
+                    sh '''
+                        docker run -d \
+                        --name vehiculosrest \
+                        -p 9090:8080 \
+                        -e SPRING_DATASOURCE_URL="$DB_URL" \
+                        -e SPRING_DATASOURCE_USERNAME="$DB_USER" \
+                        -e SPRING_DATASOURCE_PASSWORD="$DB_PASSWORD" \
+                        vehiculosrest
+                    '''
+                }
             }
         }
     }
