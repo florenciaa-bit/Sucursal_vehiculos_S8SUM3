@@ -1,16 +1,14 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Clonar repositorio') {
-            steps {
-                git 'https://github.com/florenciaa-bit/Sucursal_vehiculos_S8SUM3.git'
-            }
-        }
+    tools {
+        maven 'M3'
+    }
 
+    stages {
         stage('Compilar') {
             steps {
-                sh './mvnw clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
